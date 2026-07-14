@@ -1,0 +1,240 @@
+{
+  "entities": {
+    "JobPost": {
+      "title": "JobPost",
+      "description": "A job post created by a company or employer",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "company": { "type": "string" },
+        "date": { "type": "string" },
+        "time": { "type": "string" },
+        "location": { "type": "string" },
+        "country": { "type": "string" },
+        "state": { "type": "string" },
+        "district": { "type": "string" },
+        "customCountry": { "type": "string" },
+        "customState": { "type": "string" },
+        "customDistrict": { "type": "string" },
+        "phone": { "type": "string" },
+        "salary": { "type": "string" },
+        "description": { "type": "string" },
+        "createdAt": { "type": "integer" }
+      },
+      "required": ["title", "company", "location", "phone", "createdAt"]
+    },
+    "WorkerPost": {
+      "title": "WorkerPost",
+      "description": "A worker profile registration",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "phone": { "type": "string" },
+        "skills": { "type": "array" },
+        "country": { "type": "string" },
+        "state": { "type": "string" },
+        "district": { "type": "string" },
+        "customCountry": { "type": "string" },
+        "customState": { "type": "string" },
+        "customDistrict": { "type": "string" },
+        "expectedWage": { "type": "string" },
+        "about": { "type": "string" },
+        "age": { "type": "string" },
+        "qualification": { "type": "string" },
+        "photoUrl": { "type": "string" },
+        "createdAt": { "type": "integer" }
+      },
+      "required": ["name", "phone", "createdAt"]
+    },
+    "BrokerPost": {
+      "title": "BrokerPost",
+      "description": "A broker profile registration",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "phone": { "type": "string" },
+        "maxJobsToBroker": { "type": "string" },
+        "selectedJobs": { "type": "array" },
+        "createdAt": { "type": "integer" },
+        "subscribedUntil": { "type": "integer" },
+        "lastPaymentDate": { "type": "integer" }
+      },
+      "required": ["name", "phone", "createdAt"]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "A notification sent to users or brokers",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "text": { "type": "string" },
+        "time": { "type": "string" },
+        "read": { "type": "boolean" },
+        "createdAt": { "type": "integer" },
+        "targetBrokerId": { "type": "string" },
+        "targetBrokerName": { "type": "string" },
+        "companyPhone": { "type": "string" },
+        "workerCount": { "type": "integer" },
+        "workerWage": { "type": "string" },
+        "brokerCharge": { "type": "string" },
+        "uploadedPhotos": { "type": "array" },
+        "requiredDate": { "type": "string" },
+        "shiftStartTime": { "type": "string" },
+        "shiftEndTime": { "type": "string" },
+        "totalWorkHours": { "type": "string" },
+        "requiredGender": { "type": "string" }
+      },
+      "required": ["id", "title", "text", "time", "read", "createdAt"]
+    },
+    "AppConfig": {
+      "title": "AppConfig",
+      "description": "App configurations such as custom onboarding videos",
+      "type": "object",
+      "properties": {
+        "videoUrl": { "type": "string" },
+        "videoBase64": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      }
+    },
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile with their onboarding preferences",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "phone": { "type": "string" },
+        "role": { "type": "string" },
+        "country": { "type": "string" },
+        "state": { "type": "string" },
+        "district": { "type": "string" },
+        "lang": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "appliedJobIds": { "type": "array" },
+        "contactedEmployerIds": { "type": "array" },
+        "subscribedUntil": { "type": "integer" },
+        "lastPaymentDate": { "type": "integer" }
+      },
+      "required": ["name", "phone", "role", "createdAt"]
+    },
+    "UserActivity": {
+      "title": "UserActivity",
+      "description": "User activity log for actions like bookmarks, calls, etc.",
+      "type": "object",
+      "properties": {
+        "userPhone": { "type": "string" },
+        "activityType": { "type": "string" },
+        "descriptionBn": { "type": "string" },
+        "descriptionEn": { "type": "string" },
+        "timestamp": { "type": "integer" }
+      },
+      "required": ["userPhone", "activityType", "timestamp"]
+    },
+    "UsedUTR": {
+      "title": "UsedUTR",
+      "description": "A record of a processed and verified payment UTR to prevent double usage",
+      "type": "object",
+      "properties": {
+        "utr": { "type": "string" },
+        "amount": { "type": "integer" },
+        "phone": { "type": "string" },
+        "verifiedAt": { "type": "string" }
+      },
+      "required": ["utr", "amount", "phone", "verifiedAt"]
+    },
+    "BankSMSReceipt": {
+      "title": "BankSMSReceipt",
+      "description": "A payment credit SMS notification received from the merchant phone's forwarder",
+      "type": "object",
+      "properties": {
+        "utr": { "type": "string" },
+        "amount": { "type": "integer" },
+        "rawBody": { "type": "string" },
+        "receivedAt": { "type": "string" },
+        "matched": { "type": "boolean" },
+        "matchedPhone": { "type": "string" }
+      },
+      "required": ["utr", "amount", "rawBody", "receivedAt", "matched", "matchedPhone"]
+    },
+    "BrokerPayment": {
+      "title": "BrokerPayment",
+      "description": "A ledger tracking subscription payment attempts and status for brokers",
+      "type": "object",
+      "properties": {
+        "orderId": { "type": "string" },
+        "brokerId": { "type": "string" },
+        "brokerPhone": { "type": "string" },
+        "brokerName": { "type": "string" },
+        "utr": { "type": "string" },
+        "amount": { "type": "integer" },
+        "status": { "type": "string" },
+        "errorMessage": { "type": "string" },
+        "errorMessageBn": { "type": "string" },
+        "timestamp": { "type": "integer" },
+        "paymentMethod": { "type": "string" }
+      },
+      "required": ["orderId", "brokerId", "brokerPhone", "brokerName", "utr", "amount", "status", "timestamp"]
+    },
+    "RawSmsLog": {
+      "title": "RawSmsLog",
+      "description": "A log of incoming SMS received by webhook",
+      "type": "object",
+      "properties": {
+        "logId": { "type": "string" },
+        "rawBody": { "type": "string" },
+        "parsedUtr": { "type": "string" },
+        "parsedAmount": { "type": "integer" },
+        "status": { "type": "string" },
+        "reason": { "type": "string" },
+        "timestamp": { "type": "string" }
+      },
+      "required": ["logId", "rawBody", "status", "reason", "timestamp"]
+    }
+  },
+  "firestore": {
+    "job_posts/{postId}": {
+      "schema": "JobPost",
+      "description": "Collection of all public job posts"
+    },
+    "worker_posts/{workerId}": {
+      "schema": "WorkerPost",
+      "description": "Collection of worker registrations"
+    },
+    "broker_posts/{brokerId}": {
+      "schema": "BrokerPost",
+      "description": "Collection of broker registrations"
+    },
+    "notifications/{notifId}": {
+      "schema": "Notification",
+      "description": "Collection of all system and match notifications"
+    },
+    "app_config/{configId}": {
+      "schema": "AppConfig",
+      "description": "Collection storing application level custom config documents"
+    },
+    "user_profiles/{phone}": {
+      "schema": "UserProfile",
+      "description": "Collection storing onboarded user profile documents"
+    },
+    "user_activity/{activityId}": {
+      "schema": "UserActivity",
+      "description": "Collection of user action logging events"
+    },
+    "used_utrs/{utrId}": {
+      "schema": "UsedUTR",
+      "description": "Collection of spent UPI payment UTRs"
+    },
+    "bank_sms_receipts/{utrId}": {
+      "schema": "BankSMSReceipt",
+      "description": "Collection of received bank UPI credit SMS"
+    },
+    "broker_payments/{paymentId}": {
+      "schema": "BrokerPayment",
+      "description": "Collection of subscription payment records"
+    },
+    "raw_sms_logs/{logId}": {
+      "schema": "RawSmsLog",
+      "description": "Collection of raw received SMS webhook logs"
+    }
+  }
+}

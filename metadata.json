@@ -1,0 +1,10 @@
+{
+  "name": "Remix: Bharat ka kaam",
+  "description": "একটি সহজ প্ল্যাটফর্ম যেখানে কাজের লোক এবং কাজ দিতে ইচ্ছুক প্রতিষ্ঠান বা ব্যক্তি সরাসরি যোগাযোগ করতে পারেন।",
+  "requestFramePermissions": [
+    "geolocation"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

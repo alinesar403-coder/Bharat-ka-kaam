@@ -1,0 +1,212 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default catch-all to prevent unauthorized resource access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions for common validation checks
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Validation for JobPost schema to ensure structural integrity and prevent resource exhaustion
+    function isValidJobPost(data) {
+      return data.title is string && data.title.size() <= 300
+          && (!('company' in data) || (data.company is string && data.company.size() <= 300))
+          && (!('location' in data) || (data.location is string && data.location.size() <= 500))
+          && data.phone is string && data.phone.size() <= 100
+          && data.createdAt is int;
+    }
+
+    // Validation for WorkerPost schema
+    function isValidWorkerPost(data) {
+      return data.name is string && data.name.size() <= 300
+          && data.phone is string && data.phone.size() <= 100
+          && data.createdAt is int;
+    }
+
+    // Validation for BrokerPost schema
+    function isValidBrokerPost(data) {
+      return data.name is string && data.name.size() <= 300
+          && data.phone is string && data.phone.size() <= 100
+          && data.createdAt is int
+          && (!('subscribedUntil' in data) || data.subscribedUntil is int)
+          && (!('lastPaymentDate' in data) || data.lastPaymentDate is int);
+    }
+
+    // Validation for Notification schema
+    function isValidNotification(data) {
+      return data.title is string && data.title.size() <= 500
+          && (!('text' in data) || (data.text is string && data.text.size() <= 5000))
+          && data.createdAt is int;
+    }
+
+    // Validation for AppConfig (allows custom onboarding video links or smaller base64 payloads)
+    function isValidAppConfig(data) {
+      return (!('videoUrl' in data) || (data.videoUrl is string && data.videoUrl.size() <= 1500))
+          && (!('videoBase64' in data) || (data.videoBase64 is string && data.videoBase64.size() <= 2500000));
+    }
+
+    // Validation for UserProfile schema, ensuring that phone in document matches custom lookup key
+    function isValidUserProfile(data) {
+      return data.name is string && data.name.size() <= 200
+          && data.phone is string && data.phone.size() <= 40
+          && data.role is string && data.role.size() <= 100
+          && (!('appliedJobIds' in data) || data.appliedJobIds is list)
+          && (!('contactedEmployerIds' in data) || data.contactedEmployerIds is list)
+          && (!('subscribedUntil' in data) || data.subscribedUntil is int)
+          && (!('lastPaymentDate' in data) || data.lastPaymentDate is int)
+          && (!('authorizedDeviceId' in data) || (data.authorizedDeviceId is string && data.authorizedDeviceId.size() <= 150))
+          && (!('createdAt' in data) || data.createdAt is string);
+    }
+
+    // Validation for UserActivity schema
+    function isValidUserActivity(data) {
+      return data.userPhone is string && data.userPhone.size() <= 40
+          && data.activityType is string && data.activityType.size() <= 100
+          && data.timestamp is int;
+    }
+
+    // Validation for LoginRequest schema
+    function isValidLoginRequest(data) {
+      return data.phone is string && data.phone.size() <= 40
+          && data.requestingDeviceId is string && data.requestingDeviceId.size() <= 150
+          && data.requestingDeviceName is string && data.requestingDeviceName.size() <= 200
+          && data.status is string && data.status.size() <= 50
+          && data.timestamp is int;
+    }
+
+    // Validation for UsedUTR schema to prevent double-spending of payment receipts
+    function isValidUsedUTR(data) {
+      return data.utr is string && data.utr.size() == 12
+          && data.amount is int
+          && data.phone is string && data.phone.size() <= 100
+          && data.verifiedAt is string;
+    }
+
+    // Validation for BankSMSReceipt schema
+    function isValidBankSMSReceipt(data) {
+      return data.utr is string && data.utr.size() == 12
+          && data.amount is int
+          && data.rawBody is string
+          && data.receivedAt is string
+          && data.matched is bool
+          && data.matchedPhone is string;
+    }
+
+    // Validation for BrokerPayment schema
+    function isValidBrokerPayment(data) {
+      return data.orderId is string
+          && data.brokerId is string
+          && data.brokerPhone is string
+          && data.brokerName is string
+          && data.utr is string && data.utr.size() == 12
+          && data.amount is int
+          && data.status is string
+          && (!('errorMessage' in data) || data.errorMessage is string)
+          && (!('errorMessageBn' in data) || data.errorMessageBn is string)
+          && data.timestamp is int
+          && (!('paymentMethod' in data) || data.paymentMethod is string);
+    }
+
+    // Validation for RawSmsLog schema
+    function isValidRawSmsLog(data) {
+      return data.logId is string
+          && data.rawBody is string
+          && (!('parsedUtr' in data) || data.parsedUtr is string)
+          && (!('parsedAmount' in data) || data.parsedAmount is int)
+          && data.status is string
+          && data.reason is string
+          && data.timestamp is string;
+    }
+
+    // Collection Rules
+    match /job_posts/{postId} {
+      allow read: if true;
+      allow create: if isValidJobPost(incoming());
+      allow update: if isValidJobPost(incoming());
+      allow delete: if true;
+    }
+
+    match /worker_posts/{workerId} {
+      allow read: if true;
+      allow create: if isValidWorkerPost(incoming());
+      allow update: if isValidWorkerPost(incoming());
+      allow delete: if true;
+    }
+
+    match /broker_posts/{brokerId} {
+      allow read: if true;
+      allow create: if isValidBrokerPost(incoming());
+      allow update: if isValidBrokerPost(incoming());
+      allow delete: if true;
+    }
+
+    match /notifications/{notifId} {
+      allow read: if true;
+      allow create: if isValidNotification(incoming());
+      allow update: if isValidNotification(incoming());
+      allow delete: if true;
+    }
+
+    match /app_config/{configId} {
+      allow read: if true;
+      allow create, update: if isValidAppConfig(incoming());
+      allow delete: if true;
+    }
+
+    match /user_profiles/{phone} {
+      allow read: if true;
+      allow create, update: if isValidUserProfile(incoming()) && phone == incoming().phone;
+      allow delete: if true;
+    }
+
+    match /login_requests/{phone} {
+      allow read: if true;
+      allow create, update: if isValidLoginRequest(incoming()) && phone == incoming().phone;
+      allow delete: if true;
+    }
+
+    match /user_activity/{activityId} {
+      allow read: if true;
+      allow create: if isValidUserActivity(incoming());
+      allow update: if isValidUserActivity(incoming());
+      allow delete: if true;
+    }
+
+    match /used_utrs/{utrId} {
+      allow read: if true;
+      allow create: if isValidUsedUTR(incoming()) && utrId == incoming().utr;
+      allow update, delete: if false;
+    }
+
+    match /bank_sms_receipts/{utrId} {
+      allow read: if true;
+      allow create, update: if isValidBankSMSReceipt(incoming()) && utrId == incoming().utr;
+      allow delete: if false;
+    }
+
+    match /broker_payments/{paymentId} {
+      allow read: if true;
+      allow create, update: if isValidBrokerPayment(incoming()) && paymentId == incoming().orderId;
+      allow delete: if false;
+    }
+
+    match /raw_sms_logs/{logId} {
+      allow read: if true;
+      allow create, update: if isValidRawSmsLog(incoming()) && logId == incoming().logId;
+      allow delete: if false;
+    }
+  }
+}
